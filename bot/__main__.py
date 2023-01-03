@@ -1,34 +1,19 @@
 import asyncio
 
-from ._discord.bot import DiscordBot
+from ._discord.bot import get_discord_bot
 from ._logging import setup_logging
 from ._sched import get_scheduler
-from ._twitch.bot import TwitchBot
-from .settings import Settings
+from ._twitch.bot import get_twitch_bot
+from .settings import get_settings
 
 
 async def main():
-    settings = Settings()
-    
+    settings = get_settings()
     setup_logging(debug=settings.debug)
-
-    scheduler = get_scheduler()
-
-    discord_bot = DiscordBot(
-        settings=settings,
-        scheduler=scheduler,
-    )
-    twitch_bot = TwitchBot(
-        token=settings.twitch_token,
-        prefix=settings.twitch_prefix,
-        channels=settings.twitch_channels,
-    )
-
     async with asyncio.TaskGroup() as tg:
-        tg.create_task(twitch_bot.start())
-        tg.create_task(discord_bot.start(settings.discord_token))
-
-        scheduler.start()
+        tg.create_task(get_twitch_bot().start())
+        tg.create_task(get_discord_bot().start(settings.discord_token))
+        get_scheduler().start()
 
 
 asyncio.run(main())

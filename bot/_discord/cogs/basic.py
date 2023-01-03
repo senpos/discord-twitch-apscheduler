@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from typing import Literal
 
+from bot._sched import get_scheduler
 from ..tasks import task_remind
 
 logger = logging.getLogger(__name__)
@@ -22,29 +23,19 @@ class BasicCog(commands.Cog):
     async def slash_cmd_remind(
         self,
         interaction: discord.Interaction,
-        what: str,
+        reminder: str,
         every: app_commands.Range[int, 1],
         type: Literal["seconds", "minutes", "hours"],
     ):
-        guild_id = interaction.guild.id
-        channel_id = interaction.channel.id
-        user_id = interaction.user.id
-        task_ctx = {type: every}
-        self.bot.scheduler.add_job(
+        get_scheduler().add_job(
             task_remind,
-            args=(
-                self.bot.settings.discord_token,
-                guild_id,
-                channel_id,
-                user_id,
-                what,
-            ),
-            id=f"remind_user_is_awesome:{guild_id}:{channel_id}:{user_id}",
+            args=(interaction.channel.id, reminder),
+            id=f"remind:{interaction.user.id}:{interaction.channel.id}",
             trigger="interval",
-            **task_ctx,
+            **{type: every},
         )
         await interaction.response.send_message(
-            f'I will remind you about "{discord.utils.escape_markdown(what)}" every {every} {type}',
+            f'I will remind you about "{discord.utils.escape_markdown(reminder)}" every {every} {type}',
             ephemeral=True,
         )
 
