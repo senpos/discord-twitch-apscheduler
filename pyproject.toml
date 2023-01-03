@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "discord-twitch-apscheduler"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "discord_twitch_apscheduler"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+twitchio = "^2.5.0"
+discord-py = "^2.1.0"
+apscheduler = "^3.9.1.post1"
+pydantic = {extras = ["dotenv"], version = "^1.10.4"}
+sqlalchemy = "^1.4.45"
+httpx = "^0.23.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
